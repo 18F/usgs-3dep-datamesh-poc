@@ -1,0 +1,41 @@
+---
+title: 2024-01-22_USGS_Data_Mesh_PoC_architecture
+---
+graph TD
+  subgraph Data_Mesh_Intra_Domain_Server["Data Mesh Intra-domain Server"]
+  %%direction TD
+    subgraph Description[" "]
+      node_description_01["`**Description**
+        - Deploy via Terraform
+        - A dynamic STAC catalog server for each domain
+        - Leverage Docker containers composed together`"]:::leftalignedbox
+    end
+    subgraph Components
+      direction LR
+      node_component_01_api["`**Component 1: REST API**
+        - implemented via Python/FastAPI Docker container
+        - provides interface to STAC backend`"]:::leftalignedbox
+      node_component_02_backend["`**Component 2: STAC backend**
+        - writes to file backend via Pystac
+        - or write Postgres backend via pgSTAC`"]:::leftalignedbox
+        node_component_01_api ~~~ node_component_02_backend
+    end
+    subgraph API_Endpoint_1_Register["API Endpoint 1: Register()"]
+      direction LR
+      node_metadata_01_id["`**Required: Self-reported ID**
+      OAuth2/IAM/AD/ID.me (Stub for PoC)`"]:::leftalignedbox
+      node_metadata_02_provenance["`**Required: Provenance**
+      - Upstream Data Service Endpoint URL
+      - filename
+      - REST API call
+      - Some GUI-based map service`"]:::leftalignedbox
+      node_metadata_03_data_product_info["`**Required: Data Product Info**
+      - Jupyter notebook filename/URL (register new notebook now?)
+      - Source code has to be referenceable
+      - Plain language description
+      - return value type (Stub for PoC)`"]:::leftalignedbox
+      node_metadata_01_id ~~~ node_metadata_02_provenance ~~~ node_metadata_03_data_product_info
+    end
+    Description & Components ~~~ API_Endpoint_1_Register
+  end
+  classDef leftalignedbox text-align:left,clear:both
