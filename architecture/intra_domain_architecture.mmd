@@ -1,0 +1,77 @@
+---
+title: USGS Data Mesh PoC Architecture (2024-01-22)
+---
+graph TD
+
+  subgraph Legend["Legend"]
+    direction LR
+    node_four_pillars_legend("`Four Pillars of Data Mesh:
+      - fa:fa-flag-checkered Domain-Oriented Decentralized Data Ownership
+      - fa:fa-barcode Data as a Product
+      - fa:fa-cloud Self-service Data Infrastructure as a Platform
+      - fa:fa-id-card Federated Computational Governance`")
+    node_milestones("`GSA PoC Feature Milestone Phases:
+      1. fa:fa-dice-one February 2024
+      2. fa:fa-dice-two March 2024
+      3. fa:fa-dice-three April 2024`")
+  end
+
+  subgraph Data_Mesh_Intra_Domain_Server["Data Mesh Component 1: Intra-domain STAC Catalog & Jupyter server ('Walled Garden')"]
+  %%direction TD
+    %%subgraph Description["Description"]
+    %%  node_description_01["<br>A dynamic STAC catalog<br>server for each domain<br>"]
+    %%end
+    subgraph Components["Server Components (Docker composed together)"]
+      direction LR
+      node_component_01_backend["`**Domain STAC Catalog** fa:fa-flag-checkered
+        - implemented via Pystac/static file or pgSTAC/Postgres fa:fa-database
+        - fa:fa-dice-one Phase 1`"]
+      node_component_02_api["`**STAC API** fa:fa-barcode
+        - provides RESTful interface to domain STAC catalog
+        - implemented via Python/FastAPI Docker container
+        - fa:fa-dice-one Phase 1`"]
+      node_component_03_browser["`**STAC Browser GUI** fa:fa-barcode
+        - GUI front-end querying local STAC REST API
+        - fa:fa-dice-two Phase 2`"]
+      node_component_04_jupyter["`**JupyterHub** fa:fa-cloud
+        - Run OpenTopo Jupyter notebooks
+        - long-term: Kubernetes or Databricks-backed
+        - fa:fa-dice-three Phase 3`"]
+      node_component_01_backend & node_component_03_browser ~~~ node_component_02_api & node_component_04_jupyter
+    end
+    subgraph Deployment
+      node_deployment_iac_01["`**Terraform script** fa:fa-cloud
+      - Allocates walled garden compute, storage, security groups.
+      - fa:fa-dice-three Phase 3`"]
+      node_deployment_initialize_01["`**Domain Initialization** fa:fa-cloud
+      - Via Dockerfile RUN commands
+      - Initial setup/ingest of static resources
+      - Regester this domain with the central catalog of catalogs
+      - fa:fa-dice-two Phase 2`"]
+    end
+    %%    - Core API endpoints: Item, Catalog, Collection
+    %%    - API extensions: Query, Sort, Fields,
+    %%      Transaction, Collection-Transaction
+    subgraph API_Endpoint_1_Register["Extension to STAC API Transaction Endpoint: Register()"]
+      direction LR
+      node_metadata_01_id["`**Required: Self-reported ID** fa:fa-id-card
+      OAuth2/IAM/AD/ID.me (Stub for PoC)`"]
+      node_metadata_02_provenance["`**Required: Provenance** fa:fa-barcode
+      - Upstream Data Service Endpoint URL
+      - filename
+      - REST API call
+      - Some GUI-based map service`"]
+      node_metadata_03_data_product_info["`**Required: Data Product Info** fa:fa-barcode
+      - Jupyter notebook filename/URL (register new notebook now?)
+      - Source code has to be referenceable
+      - Plain language description
+      - return value type (Stub for PoC)`"]
+      node_metadata_01_id ~~~ node_metadata_02_provenance ~~~ node_metadata_03_data_product_info
+    end
+    %%Description & Components & Deployment ~~~ API_Endpoint_1_Register
+    Deployment & Components ~~~ API_Endpoint_1_Register
+  end
+  classDef default text-align:left,clear:both
+  %%classDef widebox width:400px
+
+%% On the catalog of catalogs API endpoint extension to see users/or domains participating in the mesh
