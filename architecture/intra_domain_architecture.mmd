@@ -14,30 +14,31 @@ graph TD
       1. fa:fa-dice-one February 2024
       2. fa:fa-dice-two March 2024
       3. fa:fa-dice-three April 2024`")
+    node_readme("`Hover over/click boxes for links to definitions.`")
   end
 
-  subgraph Data_Mesh_Intra_Domain_Server["Data Mesh Component 1: Intra-domain STAC Catalog & Jupyter server ('Walled Garden')"]
+  subgraph Data_Mesh_Intra_Domain_Server["Data Mesh Component 1: Intra-domain STAC Catalog & JupyterHub server ('Walled Garden')"]
   %%direction TD
     %%subgraph Description["Description"]
     %%  node_description_01["<br>A dynamic STAC catalog<br>server for each domain<br>"]
     %%end
     subgraph Components["Server Components (Docker composed together)"]
       direction LR
-      node_component_01_backend["`**Domain STAC Catalog** fa:fa-flag-checkered
+      node_component_stac_backend["`**Domain STAC Catalog** fa:fa-flag-checkered
         - implemented via Pystac/static file or pgSTAC/Postgres fa:fa-database
         - fa:fa-dice-one Phase 1`"]
-      node_component_02_api["`**STAC API** fa:fa-barcode
+      node_component_stac_api["`**STAC API** fa:fa-barcode
         - provides RESTful interface to domain STAC catalog
         - implemented via Python/FastAPI Docker container
         - fa:fa-dice-one Phase 1`"]
-      node_component_03_browser["`**STAC Browser GUI** fa:fa-barcode
+      node_component_stac_browser["`**STAC Browser GUI** fa:fa-barcode
         - GUI front-end querying local STAC REST API
         - fa:fa-dice-two Phase 2`"]
-      node_component_04_jupyter["`**JupyterHub** fa:fa-cloud
+      node_component_jupyterhub["`**JupyterHub** fa:fa-cloud
         - Run OpenTopo Jupyter notebooks
-        - long-term: Kubernetes or Databricks-backed
+        - long-term: Databricks, or Pangeo Cloud Federation JupyterHub Kubernetes
         - fa:fa-dice-three Phase 3`"]
-      node_component_01_backend & node_component_03_browser ~~~ node_component_02_api & node_component_04_jupyter
+      node_component_stac_backend & node_component_stac_browser ~~~ node_component_stac_api & node_component_jupyterhub
     end
     subgraph Deployment
       node_deployment_iac_01["`**Terraform script** fa:fa-cloud
@@ -52,26 +53,37 @@ graph TD
     %%    - Core API endpoints: Item, Catalog, Collection
     %%    - API extensions: Query, Sort, Fields,
     %%      Transaction, Collection-Transaction
-    subgraph API_Endpoint_1_Register["Extension to STAC API Transaction Endpoint: Register()"]
-      direction LR
-      node_metadata_01_id["`**Required: Self-reported ID** fa:fa-id-card
+    subgraph API_Endpoint_1_Register["GSA PoC Customization of STAC API: RegisterDataProduct()"]
+      direction TB
+      node_API_transaction_endpoint_baseline["`**Baseline API endpoint definition:**
+      - STAC API Extension Endpoint 'Transaction'
+      - Supports HTTP methods POST, PUT, PATCH, DELETE
+      - Input body: 'STAC Item' GeoJSON Feature augmented with 'Foreign Members'`"]
+      node_API_customization1_id["`**GSA Customization 1:
+      Self-reported ID** fa:fa-id-card
       OAuth2/IAM/AD/ID.me (Stub for PoC)`"]
-      node_metadata_02_provenance["`**Required: Provenance** fa:fa-barcode
-      - Upstream Data Service Endpoint URL
-      - filename
-      - REST API call
-      - Some GUI-based map service`"]
-      node_metadata_03_data_product_info["`**Required: Data Product Info** fa:fa-barcode
+      node_API_customization2_provenance["`**GSA Customization 2:
+      Provenance** fa:fa-barcode
+      - Enforce existence of 'Link' object of relation type='derived_from'
+      - could be upstream data service endpoint URL, filename, REST API call, GUI-based map service, etc`"]
+      node_API_customization3_data_product_info["`**GSA Customization 3:
+      Data Product Info** fa:fa-barcode
       - Jupyter notebook filename/URL (register new notebook now?)
       - Source code has to be referenceable
       - Plain language description
-      - return value type (Stub for PoC)`"]
-      node_metadata_01_id ~~~ node_metadata_02_provenance ~~~ node_metadata_03_data_product_info
+      - return value type of data product (Stub for PoC)`"]
+      node_API_transaction_endpoint_baseline ~~~ node_API_customization1_id & node_API_customization2_provenance & node_API_customization3_data_product_info
     end
     %%Description & Components & Deployment ~~~ API_Endpoint_1_Register
     Deployment & Components ~~~ API_Endpoint_1_Register
   end
   classDef default text-align:left,clear:both
   %%classDef widebox width:400px
+  click node_component_stac_backend "https://github.com/stac-utils/pgstac" _blank
+  click node_component_stac_api "https://github.com/stac-utils/stac-fastapi-pgstac" _blank
+  click node_component_stac_browser "https://github.com/radiantearth/stac-browser" _blank
+  click node_component_jupyterhub "https://github.com/pangeo-data/pangeo-cloud-federation" _blank
+  click node_API_transaction_endpoint_baseline "https://stac-api-extensions.github.io/" _blank
+  click node_API_customization2_provenance "https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md#link-object" _blank
 
 %% On the catalog of catalogs API endpoint extension to see users/or domains participating in the mesh
