@@ -1,5 +1,5 @@
 ---
-title: USGS Data Mesh PoC Architecture (2024-01-22)
+title: USGS Data Mesh PoC Architecture (2024-03-12)
 ---
 graph TD
 
@@ -10,45 +10,45 @@ graph TD
       - fa:fa-barcode Data as a Product
       - fa:fa-cloud Self-service Data Infrastructure as a Platform
       - fa:fa-id-card Federated Computational Governance`")
-    node_milestones("`GSA PoC Feature Milestone Phases:
-      1. fa:fa-dice-one February 2024
-      2. fa:fa-dice-two March 2024
-      3. fa:fa-dice-three April 2024`")
+    %% node_milestones("`GSA PoC Feature Milestone Phases:
+    %%  1. fa:fa-dice-one February 2024
+    %%  2. fa:fa-dice-two March 2024
+    %% 3. fa:fa-dice-three April 2024`")
     node_readme("`Hover over/click boxes for links to definitions.`")
   end
 
-  subgraph Data_Mesh_Intra_Domain_Server["Data Mesh Component 1: Intra-domain STAC Catalog & JupyterHub server ('Walled Garden')"]
+  subgraph Data_Mesh_Intra_Domain_Server["Intra-agency \"Data Commons\" (a node in the 3DEP Data Mesh Ecosystem)"]
   %%direction TD
     %%subgraph Description["Description"]
     %%  node_description_01["<br>A dynamic STAC catalog<br>server for each domain<br>"]
     %%end
     subgraph Components["Server Components (Docker composed together)"]
       direction LR
-      node_component_stac_backend["`**Domain STAC Catalog** fa:fa-flag-checkered
-        - implemented via Pystac/static file or pgSTAC/Postgres fa:fa-database
-        - fa:fa-dice-one Phase 1`"]
+      node_component_stac_backend["`**Intra-agency STAC Catalog** fa:fa-flag-checkered
+        - implemented via pgSTAC/PostGIS fa:fa-database`"]
       node_component_stac_api["`**STAC API** fa:fa-barcode
-        - provides RESTful interface to domain STAC catalog
-        - implemented via Python/FastAPI Docker container
-        - fa:fa-dice-one Phase 1`"]
-      node_component_stac_browser["`**STAC Browser GUI** fa:fa-barcode
-        - GUI front-end querying local STAC REST API
-        - fa:fa-dice-two Phase 2`"]
+        - Real-time, dynamic querying, filtering, and retrieval of data
+        - provides RESTful interface to intra-agency STAC catalog
+        - implemented via Python/FastAPI`"]
+      node_component_stac_browser["`**STAC Browser** fa:fa-barcode
+        - Browser-based data discovery tool
+        - Search for data products both internal and external to local STAC catalog
+        - Kick off new processing workflows with search results`"]
       node_component_jupyterhub["`**JupyterHub** fa:fa-cloud
-        - Run OpenTopo Jupyter notebooks
-        - long-term: Databricks, or Pangeo Cloud Federation JupyterHub Kubernetes
-        - fa:fa-dice-three Phase 3`"]
+        - Can receive discovered search results as input with blank workspace
+        - Example Jupyter notebooks provided
+        - 3DEP libraries preinstalled (Entwine, PDAL, GDAL)`"]
+        %% - long-term: Databricks, or Pangeo Cloud Federation JupyterHub Kubernetes`"]
       node_component_stac_backend & node_component_stac_browser ~~~ node_component_stac_api & node_component_jupyterhub
     end
     subgraph Deployment
       node_deployment_iac_01["`**Terraform script** fa:fa-cloud
-      - Allocates walled garden compute, storage, security groups.
-      - fa:fa-dice-three Phase 3`"]
+      - Allocates cloud compute, storage, security groups.`"]
       node_deployment_initialize_01["`**Domain Initialization** fa:fa-cloud
       - Via Dockerfile RUN commands
       - Initial setup/ingest of static resources
-      - Regester this domain with the central catalog of catalogs
-      - fa:fa-dice-two Phase 2`"]
+      - Optionally regester this Data Commons instance with catalog server
+      - Or manually add other external Data Commons for data discovery`"]
     end
     %%    - Core API endpoints: Item, Catalog, Collection
     %%    - API extensions: Query, Sort, Fields,
